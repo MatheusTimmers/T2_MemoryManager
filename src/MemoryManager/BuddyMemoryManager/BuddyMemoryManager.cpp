@@ -75,7 +75,7 @@ bool BuddyMemoryManager::Dealloc(std::string label) {
         buddy->m_State = BuddyState::FREE;
         buddy->m_AllocSize = 0;
         Merge(buddy->m_Parent);
-
+        
         return true;
       }
     }

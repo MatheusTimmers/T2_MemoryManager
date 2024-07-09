@@ -18,4 +18,10 @@ struct Process {
   int         MemorySize;
 };
 
+enum BuddyState {
+  DIVIDED,
+  FREE,
+  ALLOCATED
+};
+
 #endif

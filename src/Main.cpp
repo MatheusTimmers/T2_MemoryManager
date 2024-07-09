@@ -4,6 +4,7 @@
 #include "./Enums/Enums.hpp"
 #include "./FileReader/FileReader.hpp"
 #include "./MemoryManager/PartitionMemoryManager/PartitionMemoryManager.hpp"
+#include "./MemoryManager/BuddyMemoryManager/BuddyMemoryManager.hpp"
   
 using namespace std;
 
@@ -30,6 +31,8 @@ int main(){
   int  nMemorySize;
   char cMemManagement, cVarPartitions;
   PartitionMemoryManager* manager;
+  BuddyMemoryManager*     buddy;
+  bool bIsBuddy = false;
 
   // Le arquivo de process
   FileReader* file = new FileReader();
@@ -60,26 +63,58 @@ int main(){
     }
   }
   else if (cMemManagement == '2'){
-    
+    buddy = new BuddyMemoryManager(nMemorySize);
+    bIsBuddy = true;
   }
   else{
     cout << "Error, numero invalido: " << cMemManagement << endl;
-  }
+  } 
   
-  if (manager != nullptr) {
+  if (!bIsBuddy) {
     for (string process : ListProcess) {
       std::cout << process << endl;
-
+      
       if (process.substr(0, 2) == "IN") {
         Process* p = GetCommandIN(process);
        
-        if (p != nullptr)
-          manager->Alloc(p->ProcessName, p->MemorySize);
+        if (p != nullptr) {
+          if (!manager->Alloc(p->ProcessName, p->MemorySize)) {
+            std::cout << "Error: nao foi possivel alocar espaco" << endl;
+          } 
+        }
       } 
       else if (process.substr(0, 3) == "OUT") {
         string ProcessName = GetContent(process);
-        manager->Dealloc(ProcessName);
+        if (!manager->Dealloc(ProcessName)) {
+          std::cout << "Error: nao foi possivel alocar espaco" << endl;
+        } 
       }
+    }
+  }
+  else { 
+    for (string process : ListProcess) {
+      std::cout << process << endl;
+      
+      if (process.substr(0, 2) == "IN") {
+        Process* p = GetCommandIN(process);
+
+        if (p != nullptr)
+          if (!buddy->Alloc(p->ProcessName, p->MemorySize)) 
+            std::cout << "Error: nao foi possivel alocar espaco" << endl;
+
+        std::cout << "Alloc" << endl;
+        std::cout << buddy->toString();
+      } 
+      else if (process.substr(0, 3) == "OUT") {
+        string ProcessName = GetContent(process);
+        if (!buddy->Dealloc(ProcessName))
+          std::cout << "Error: nao foi possivel alocar espaco" << endl;
+        
+        std::cout << "Dealloc" << endl;
+        std::cout << buddy->toString();
+      }
+      else
+        cout << "Manager nao foi criado" << endl;
     }
   }
 
