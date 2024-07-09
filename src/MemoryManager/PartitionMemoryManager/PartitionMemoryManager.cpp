@@ -86,15 +86,22 @@ Segment*  PartitionMemoryManager::GetNextFreeSegment(int size) {
     Segment* seg = this->m_LastAlloc->Next();
 
     // Roda até chegar no LastAlloc, ou seja deu a volta
-    while ((seg != nullptr) and (seg != this->m_LastAlloc)) {
+    while (seg != this->m_LastAlloc) {
+      // Chegou ao fim da linha, volta para o inicio
+      if (seg == nullptr) {
+        seg = this->m_MemorySpace;
+
+        // Resolve o bug de LastAlloc for na primeira pos
+        // entrava em um loop quando tinha apenas dois process na tabela
+        // Pois ele nunca Verificava se this->m_MemorySpace == this->m_LastAlloc
+        if (seg == this->m_LastAlloc)
+          break;
+      }
+
       if (seg->IsFree() and seg->Size() >= size)
         return seg;
 
       seg = seg->Next();
-      
-      // Chegou ao fim da linha, volta para o inicio
-      if (seg == nullptr)
-        seg = this->m_MemorySpace;
     }
     
     // Não encotramos, retorna vazio

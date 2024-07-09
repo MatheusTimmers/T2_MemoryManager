@@ -26,7 +26,11 @@ void Segment::Union() {
   this->m_Size    = this->m_Size + this->m_Next->Size();
   this->m_Start   = this->m_Start;
 
-  this->m_Next    = this->m_Next->Next();
+  Segment* seg = this->m_Next;
+
+  this->m_Next = this->m_Next->Next();
+  
+  delete seg;
 }
 
 void Segment::Free() {
